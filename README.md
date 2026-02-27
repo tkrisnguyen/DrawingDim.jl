@@ -81,9 +81,8 @@ plot!(dcont)
 
 Important style options:
 
-- `arrowhead_style` (`:closed_filled`, `:closed`, `:open`, `:none`)
-- `arrowhead_style` (`:closed_filled`, `:closed`, `:open`, `:small_open`, `:hook`, `:tick`, `:dot`, `:none`)
-- `text_font` (preferred: `"ISOCP"` when available in backend)
+- `arrowhead_style` (`:closed_filled`, `:closed`, `:closed_blank`, `:open`, `:open30`, `:open90`, `:open_out`, `:open30_out`, `:open90_out`, `:small_open`, `:oblique`, `:tick`, `:dot`, `:dot_small`, `:hook`, `:none`)
+- `text_font` (GR-safe default: `"Helvetica"`)
 - `text_orientation` (`:aligned`, `:horizontal`, `:vertical`)
 - `text_placement` (`:above`, `:below`, `:centered`)
 - `fit_mode` (`:best`, `:text_inside`, `:text_outside`)
@@ -95,7 +94,7 @@ Preferred style example:
 ```julia
 DIMSTYLE(
 	arrowhead_style=:small_open,
-	text_font="ISOCP",
+	text_font="Helvetica",
 	text_orientation=:aligned,
 	text_placement=:above,
 	fit_mode=:best,
@@ -161,6 +160,7 @@ All points can be passed as `(x, y)` tuples or `Point2D`.
 - Command reference: `docs/commands.md`
 - Formatter reference: `docs/formatters.md`
 - Examples guide: `docs/examples.md`
+- Registry registration guide: `docs/registration.md`
 
 Runnable examples:
 

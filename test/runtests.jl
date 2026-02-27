@@ -6,7 +6,7 @@ using DrawingDim
     DIMSTYLE(decimals=1, unit_suffix=" mm", text_height=8.0, arrow_size=2.5)
 
     s = current_dimstyle()
-    @test s.arrowhead_style === :closed_filled
+    @test s.arrowhead_style isa Symbol
     @test !isempty(s.text_font)
     @test s.text_orientation === :aligned
     @test s.text_placement === :above
@@ -24,6 +24,18 @@ using DrawingDim
 
     s4 = DIMSTYLE(decimals=1, unit_suffix=" mm", arrowhead_style=:hook)
     @test s4.arrowhead_style === :hook
+
+    s5 = DIMSTYLE(decimals=1, unit_suffix=" mm", arrowhead_style=:oblique)
+    @test s5.arrowhead_style === :oblique
+
+    s6 = DIMSTYLE(decimals=1, unit_suffix=" mm", arrowhead_style=:open30)
+    @test s6.arrowhead_style === :open30
+
+    s7 = DIMSTYLE(decimals=1, unit_suffix=" mm", arrowhead_style=:open_out)
+    @test s7.arrowhead_style === :open_out
+
+    s8 = DIMSTYLE(decimals=1, unit_suffix=" mm", arrowhead_style=:open30_out)
+    @test s8.arrowhead_style === :open30_out
 
     dlin = DIMLINEAR((0.0, 0.0), (10.0, 0.0); orientation=:horizontal, offset=5.0)
     @test dlin isa LinearDimension

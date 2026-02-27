@@ -7,6 +7,7 @@ DrawingDim provides AutoCAD-style 2D dimensioning utilities for Julia and integr
 - [Command Reference](commands.md)
 - [Formatters](formatters.md)
 - [Examples Guide](examples.md)
+- [Registry Registration Guide](registration.md)
 
 ## Quick setup
 

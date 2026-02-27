@@ -2,7 +2,7 @@ name: Documentation
 
 on:
   push:
-    branches: [main1]
+    branches: [main]
     tags: ['*']
   pull_request:
 

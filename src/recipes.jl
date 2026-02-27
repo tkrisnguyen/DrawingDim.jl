@@ -11,6 +11,16 @@ end
 function _arrow_segments_by_style(tip::Point2D, inward_dir::Point2D, size::Real, style::Symbol)
     if style === :small_open
         return _arrow_segments(tip, inward_dir, size * 0.9; spread=π / 11)
+    elseif style === :open30
+        return _arrow_segments(tip, inward_dir, size; spread=π / 12)
+    elseif style === :open90
+        return _arrow_segments(tip, inward_dir, size * 0.9; spread=π / 4)
+    elseif style === :open_out
+        return _arrow_segments(tip, -inward_dir, size)
+    elseif style === :open30_out
+        return _arrow_segments(tip, -inward_dir, size; spread=π / 12)
+    elseif style === :open90_out
+        return _arrow_segments(tip, -inward_dir, size * 0.9; spread=π / 4)
     elseif style === :hook
         return _arrow_segments(tip, inward_dir, size * 0.75; spread=π / 10)
     end
@@ -18,7 +28,7 @@ function _arrow_segments_by_style(tip::Point2D, inward_dir::Point2D, size::Real,
 end
 
 function _arrow_path(style::Symbol, tip::Point2D, w1::Point2D, w2::Point2D)
-    if style === :closed
+    if style === :closed || style === :closed_blank
         x = [tip.x, w1.x, w2.x, tip.x]
         y = [tip.y, w1.y, w2.y, tip.y]
     elseif style === :hook
@@ -33,11 +43,31 @@ function _arrow_path(style::Symbol, tip::Point2D, w1::Point2D, w2::Point2D)
     return x, y
 end
 
-function _tick_path(tip::Point2D, inward_dir::Point2D, size::Real)
+_is_slash_style(style::Symbol) = style === :tick || style === :oblique
+_is_dot_style(style::Symbol) = style === :dot || style === :dot_small
+
+function _slash_path(style::Symbol, tip::Point2D, inward_dir::Point2D, size::Real)
     d = unit(inward_dir)
-    t = rotate(-d, π / 4)
-    p2 = tip + 1.3 * size * t
-    return [tip.x, p2.x], [tip.y, p2.y]
+    angle = style === :oblique ? π / 6 : π / 4
+    t = rotate(-d, angle)
+    half = 0.65 * size
+    p1 = tip - half * t
+    p2 = tip + half * t
+    return [p1.x, p2.x], [p1.y, p2.y]
+end
+
+function _dot_markersize(style::Symbol, size::Real)
+    return style === :dot_small ? max(1.6, size) : max(2.0, size * 1.4)
+end
+
+function _extension_segment(point::Point2D, extension_end::Point2D)
+    v = extension_end - point
+    len = norm2d(v)
+    if len == 0
+        return point, extension_end
+    end
+    start = point + 0.2 * v
+    return start, extension_end
 end
 
 _rad2deg(θ::Real) = 180 * θ / π
@@ -162,15 +192,17 @@ end
 
     @series begin
         seriestype := :path
-        x = [d.p1.x, d.ext1.x]
-        y = [d.p1.y, d.ext1.y]
+        e1s, e1e = _extension_segment(d.p1, d.ext1)
+        x = [e1s.x, e1e.x]
+        y = [e1s.y, e1e.y]
         x, y
     end
 
     @series begin
         seriestype := :path
-        x = [d.p2.x, d.ext2.x]
-        y = [d.p2.y, d.ext2.y]
+        e2s, e2e = _extension_segment(d.p2, d.ext2)
+        x = [e2s.x, e2e.x]
+        y = [e2s.y, e2e.y]
         x, y
     end
 
@@ -203,20 +235,20 @@ end
             y = [d.dim2.y, a21.y, a22.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [d.dim1.x, d.dim2.x]
             y = [d.dim1.y, d.dim2.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(d.dim1, dir1, d.style.arrow_size)
-        tx2, ty2 = _tick_path(d.dim2, dir2, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, d.dim1, dir1, d.style.arrow_size)
+        tx2, ty2 = _slash_path(d.style.arrowhead_style, d.dim2, dir2, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color
@@ -306,20 +338,20 @@ end
             y = [p2_arc.y, a21.y, a22.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [p1_arc.x, p2_arc.x]
             y = [p1_arc.y, p2_arc.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(p1_arc, tan1, d.style.arrow_size)
-        tx2, ty2 = _tick_path(p2_arc, tan2, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, p1_arc, tan1, d.style.arrow_size)
+        tx2, ty2 = _slash_path(d.style.arrowhead_style, p2_arc, tan2, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color
@@ -408,20 +440,20 @@ end
             y = [p2_arc.y, a21.y, a22.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [p1_arc.x, p2_arc.x]
             y = [p1_arc.y, p2_arc.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(p1_arc, tan1, d.style.arrow_size)
-        tx2, ty2 = _tick_path(p2_arc, tan2, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, p1_arc, tan1, d.style.arrow_size)
+        tx2, ty2 = _slash_path(d.style.arrowhead_style, p2_arc, tan2, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color
@@ -480,15 +512,17 @@ end
 
     @series begin
         seriestype := :path
-        x = [d.p1.x, d.ext1.x]
-        y = [d.p1.y, d.ext1.y]
+        e1s, e1e = _extension_segment(d.p1, d.ext1)
+        x = [e1s.x, e1e.x]
+        y = [e1s.y, e1e.y]
         x, y
     end
 
     @series begin
         seriestype := :path
-        x = [d.p2.x, d.ext2.x]
-        y = [d.p2.y, d.ext2.y]
+        e2s, e2e = _extension_segment(d.p2, d.ext2)
+        x = [e2s.x, e2e.x]
+        y = [e2s.y, e2e.y]
         x, y
     end
 
@@ -521,20 +555,20 @@ end
             y = [d.dim2.y, a21.y, a22.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [d.dim1.x, d.dim2.x]
             y = [d.dim1.y, d.dim2.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(d.dim1, dir1, d.style.arrow_size)
-        tx2, ty2 = _tick_path(d.dim2, dir2, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, d.dim1, dir1, d.style.arrow_size)
+        tx2, ty2 = _slash_path(d.style.arrowhead_style, d.dim2, dir2, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color
@@ -587,19 +621,19 @@ end
             y = [d.point.y, a1.y, a2.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [d.point.x]
             y = [d.point.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(d.point, d.center - d.point, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, d.point, d.center - d.point, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color
@@ -660,20 +694,20 @@ end
             y = [d.p2.y, a21.y, a22.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :dot
+    elseif _is_dot_style(d.style.arrowhead_style)
         @series begin
             seriestype := :scatter
             markerstrokecolor := d.style.color
             markercolor := d.style.color
             markershape := :circle
-            markersize := max(2.0, d.style.arrow_size * 1.4)
+            markersize := _dot_markersize(d.style.arrowhead_style, d.style.arrow_size)
             x = [d.p1.x, d.p2.x]
             y = [d.p1.y, d.p2.y]
             x, y
         end
-    elseif d.style.arrowhead_style === :tick
-        tx1, ty1 = _tick_path(d.p1, d.center - d.p1, d.style.arrow_size)
-        tx2, ty2 = _tick_path(d.p2, d.center - d.p2, d.style.arrow_size)
+    elseif _is_slash_style(d.style.arrowhead_style)
+        tx1, ty1 = _slash_path(d.style.arrowhead_style, d.p1, d.center - d.p1, d.style.arrow_size)
+        tx2, ty2 = _slash_path(d.style.arrowhead_style, d.p2, d.center - d.p2, d.style.arrow_size)
         @series begin
             seriestype := :path
             linecolor := d.style.color

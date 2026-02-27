@@ -16,11 +16,19 @@ CurrentModule = DrawingDim
 
 - `:closed_filled`
 - `:closed`
+- `:closed_blank`
 - `:open`
+- `:open30`
+- `:open90`
+- `:open_out`
+- `:open30_out`
+- `:open90_out`
 - `:small_open`
+- `:oblique`
 - `:hook`
 - `:tick`
 - `:dot`
+- `:dot_small`
 - `:none`
 
 ## Text behavior

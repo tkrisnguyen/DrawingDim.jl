@@ -179,7 +179,7 @@ function _dimension_text_position(dim1::Point2D, dim2::Point2D, style::DimStyle)
     end
 
     n = _text_offset_direction(span_vec, style)
-    inside_pos = midpoint(dim1, dim2) + side * style.text_height * 0.6 * n
+    inside_pos = midpoint(dim1, dim2) + side * style.text_height * 0.4 * n
     needed_span = style.text_height * style.fit_text_gap_factor
 
     if style.fit_mode === :text_outside || (style.fit_mode === :best && span < needed_span)

@@ -6,6 +6,8 @@ version = "0.1.1"
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DrawingDim = "3b4f1277-4f84-48a8-a8ec-5e08d2f3a5e9"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 
 [compat]
 julia = "1.9"

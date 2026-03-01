@@ -19,6 +19,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/tkrisnguyen/DrawingDim.git",
+    repo = "github.com/tkrisnguyen/DrawingDim.jl.git",
     devbranch = "main",
 )

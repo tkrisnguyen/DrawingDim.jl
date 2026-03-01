@@ -15,7 +15,6 @@ makedocs(
         "Command Reference" => "commands.md",
         "Formatters" => "formatters.md",
         "Examples" => "examples.md",
-        "Registration" => "registration.md",
     ],
 )
 

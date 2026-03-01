@@ -4,13 +4,13 @@ CurrentModule = DrawingDim
 
 # Command Reference
 
-`DrawingDim` provides AutoCAD-style commands:
+`DrawingDim` provides AutoCAD-style dimensioning functions:
 
-- `DIMSTYLE`
-- `DIMLINEAR`, `DIMALIGNED`, `DIMANGULAR`, `DIMARC`
-- `DIMCENTER`, `DIMJOGGED`
-- `DIMRADIAL`, `DIMDIAMETER`, `DIMORDINATE`
-- `DIMBASELINE`, `DIMCONTINUE`
+- `set_dimstyle`
+- `dim_linear`, `dim_aligned`, `dim_angular`, `dim_arc`
+- `dim_center`, `dim_jogged`
+- `dim_radial`, `dim_diameter`, `dim_ordinate`
+- `dim_baseline`, `dim_continue`
 
 ## Arrow styles
 

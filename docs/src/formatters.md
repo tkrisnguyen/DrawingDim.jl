@@ -6,8 +6,8 @@ CurrentModule = DrawingDim
 
 ## Tolerance
 
-Use `DIMTOLERANCE` for deviation/symmetric notation.
+Use `dim_tolerance` for deviation/symmetric notation.
 
 ## Limits
 
-Use `DIMLIMITS(nominal, lower, upper)` for limits notation (`upper / lower`).
+Use `dim_limits(nominal, lower, upper)` for limits notation (`upper / lower`).
